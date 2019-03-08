@@ -57,16 +57,12 @@ X, y, median_scores, true_scores = X_iterator.get_next()
 
 true_scores = tf.expand_dims(true_scores, 2)
 P_true = util.neuralsort(true_scores, 1e-10)
-
 n_prime = n
-
-# P: ? x n x n
-# returns: ? x n
 
 
 def get_median_probs(P):
-    median_strip = P[:, n // 2, :]  # M x n
-    median_total = tf.reduce_sum(median_strip, axis=1, keepdims=True)  # M x 1
+    median_strip = P[:, n // 2, :]
+    median_total = tf.reduce_sum(median_strip, axis=1, keepdims=True)
     probs = median_strip / median_total
     # print(probs)
     return probs
@@ -74,31 +70,31 @@ def get_median_probs(P):
 
 if method == 'vanilla':
     with tf.variable_scope("phi"):
-        representations = multi_mnist_cnn.deepnn(l, X, 10)  # ((M x n) x n')
+        representations = multi_mnist_cnn.deepnn(l, X, 10)
     representations = tf.reshape(representations, [M, n * 10])
     fc1 = tf.layers.dense(representations, 10, tf.nn.relu)
-    fc2 = tf.layers.dense(fc1, 10, tf.nn.relu)  # M x 10
-    fc3 = tf.layers.dense(fc2, 10, tf.nn.relu)  # M x 10
-    y_hat = tf.layers.dense(fc3, 1)  # M x 1
-    y_hat = tf.squeeze(y_hat)  # M
+    fc2 = tf.layers.dense(fc1, 10, tf.nn.relu)
+    fc3 = tf.layers.dense(fc2, 10, tf.nn.relu)
+    y_hat = tf.layers.dense(fc3, 1)
+    y_hat = tf.squeeze(y_hat)
     loss_phi = tf.reduce_sum(tf.squared_difference(y_hat, y))
     loss_theta = loss_phi
     prob_median_eval = 0
 
 elif method == 'sinkhorn':
     with tf.variable_scope('phi'):
-        representations = multi_mnist_cnn.deepnn(l, X, n)  # ((M x n) x n)
+        representations = multi_mnist_cnn.deepnn(l, X, n)
         pre_sinkhorn = tf.reshape(representations, [M, n, n])
     with tf.variable_scope('theta'):
-        regression_candidates = multi_mnist_cnn.deepnn(l, X, 1)  # M x n x 1
+        regression_candidates = multi_mnist_cnn.deepnn(l, X, 1)
         regression_candidates = tf.reshape(
-            regression_candidates, [M, n])  # M x n
+            regression_candidates, [M, n])
 
     P_hat = sinkhorn_operator(pre_sinkhorn, temp=temp)
-    prob_median = get_median_probs(P_hat)  # M x n
+    prob_median = get_median_probs(P_hat)
 
     point_estimates = tf.reduce_sum(
-        prob_median * regression_candidates, axis=1)  # M
+        prob_median * regression_candidates, axis=1)
     exp_loss = tf.squared_difference(y, point_estimates)
 
     loss_phi = tf.reduce_mean(exp_loss)
@@ -109,25 +105,24 @@ elif method == 'sinkhorn':
 
 elif method == 'gumbel_sinkhorn':
     with tf.variable_scope('phi'):
-        representations = multi_mnist_cnn.deepnn(l, X, n)  # ((M x n) x n)
+        representations = multi_mnist_cnn.deepnn(l, X, n)
         pre_sinkhorn_orig = tf.reshape(representations, [M, n, n])
         pre_sinkhorn = tf.tile(pre_sinkhorn_orig, [
-                               n_s, 1, 1])  # (n_s x M) x n x n
-        # (n_s x M) x n x n
+                               n_s, 1, 1])
         pre_sinkhorn += util.sample_gumbel([n_s * M, n, n])
 
     with tf.variable_scope('theta'):
-        regression_candidates = multi_mnist_cnn.deepnn(l, X, 1)  # M x n x 1
+        regression_candidates = multi_mnist_cnn.deepnn(l, X, 1)
         regression_candidates = tf.reshape(
-            regression_candidates, [M, n])  # M x n
+            regression_candidates, [M, n])
 
     P_hat = sinkhorn_operator(pre_sinkhorn, temp=temp)
-    prob_median = get_median_probs(P_hat)  # (n_s x M) x n
-    prob_median = tf.reshape(prob_median, [n_s, M, n])  # n_s x M x n
+    prob_median = get_median_probs(P_hat)
+    prob_median = tf.reshape(prob_median, [n_s, M, n])
 
     point_estimates = tf.reduce_sum(
-        prob_median * regression_candidates, axis=2)  # n_s x M
-    exp_loss = tf.squared_difference(y, point_estimates)  # n_s x M
+        prob_median * regression_candidates, axis=2)
+    exp_loss = tf.squared_difference(y, point_estimates)
 
     loss_phi = tf.reduce_mean(exp_loss)
     loss_theta = loss_phi
@@ -137,62 +132,60 @@ elif method == 'gumbel_sinkhorn':
 
 elif method == 'deterministic_neuralsort':
     with tf.variable_scope('phi'):
-        scores = multi_mnist_cnn.deepnn(l, X, 1)  # ((M x n) x 1)
-        scores = tf.reshape(scores, [M, n, 1])  # M x n x 1
+        scores = multi_mnist_cnn.deepnn(l, X, 1)
+        scores = tf.reshape(scores, [M, n, 1])
 
-    P_hat = util.neuralsort(scores, temp)  # M x n x n
+    P_hat = util.neuralsort(scores, temp)
     P_hat_eval = util.neuralsort(scores, 1e-20)
 
     with tf.variable_scope('theta'):
-        regression_candidates = multi_mnist_cnn.deepnn(l, X, 1)  # M x n x 1
+        regression_candidates = multi_mnist_cnn.deepnn(l, X, 1)
         regression_candidates = tf.reshape(
-            regression_candidates, [M, n])  # M x n
+            regression_candidates, [M, n])
 
     losses = tf.squared_difference(
-        regression_candidates, tf.expand_dims(y, 1))  # M x n
+        regression_candidates, tf.expand_dims(y, 1))
     prob_median = get_median_probs(P_hat)
     prob_median_eval = get_median_probs(P_hat_eval)
 
     point_estimates = tf.reduce_sum(
-        prob_median * regression_candidates, axis=1)  # M
-    exp_loss = tf.squared_difference(y, point_estimates)  # M
+        prob_median * regression_candidates, axis=1)
+    exp_loss = tf.squared_difference(y, point_estimates)
 
     point_estimates_eval = tf.reduce_sum(
-        prob_median_eval * regression_candidates, axis=1)  # M
-    exp_loss_eval = tf.squared_difference(y, point_estimates)  # M
+        prob_median_eval * regression_candidates, axis=1)
+    exp_loss_eval = tf.squared_difference(y, point_estimates)
 
     loss_phi = tf.reduce_mean(exp_loss)
     loss_theta = tf.reduce_mean(exp_loss_eval)
 
 elif method == 'stochastic_neuralsort':
     with tf.variable_scope('phi'):
-        scores = multi_mnist_cnn.deepnn(l, X, 1)  # ((M x n) x 1)
-        scores = tf.reshape(scores, [M, n, 1])  # M x n x 1
-        scores = tf.tile(scores, [n_s, 1, 1])  # (M x n_s) x n x 1
+        scores = multi_mnist_cnn.deepnn(l, X, 1)
+        scores = tf.reshape(scores, [M, n, 1])
+        scores = tf.tile(scores, [n_s, 1, 1])
         scores += util.sample_gumbel([M * n_s, n, 1])
 
-    P_hat = util.neuralsort(scores, temp)  # (M x n_s) x n x n
+    P_hat = util.neuralsort(scores, temp)
     P_hat_eval = util.neuralsort(scores, 1e-20)
 
     with tf.variable_scope('theta'):
-        regression_candidates = multi_mnist_cnn.deepnn(l, X, 1)  # M x n x 1
+        regression_candidates = multi_mnist_cnn.deepnn(l, X, 1)
         regression_candidates = tf.reshape(
-            regression_candidates, [M, n])  # M x n
+            regression_candidates, [M, n])
 
     res_y = tf.expand_dims(y, 1)
-    # res_y = tf.tile(res_y, [n_s, 1]) # (M * n_s) x 1
-    # regression_candidates: M x n
 
-    losses = tf.squared_difference(regression_candidates, res_y)  # M x n
+    losses = tf.squared_difference(regression_candidates, res_y)
 
-    prob_median = get_median_probs(P_hat)  # (n_s x M) x n fix notation
+    prob_median = get_median_probs(P_hat)
     prob_median = tf.reshape(prob_median, [n_s, M, n])
-    prob_median_eval = get_median_probs(P_hat_eval)  # (n_s x M) x n
-    prob_median_eval = tf.reshape(prob_median_eval, [n_s, M, n])  # n_s x M x n
+    prob_median_eval = get_median_probs(P_hat_eval)
+    prob_median_eval = tf.reshape(prob_median_eval, [n_s, M, n])
 
-    exp_losses = tf.reduce_sum(prob_median * losses, axis=2)  # n_s x M
+    exp_losses = tf.reduce_sum(prob_median * losses, axis=2)
     exp_losses_eval = tf.reduce_sum(
-        prob_median_eval * losses, axis=2)  # n_s x M
+        prob_median_eval * losses, axis=2)
 
     loss_phi = tf.reduce_mean(exp_losses)
     loss_theta = tf.reduce_mean(exp_losses_eval)
@@ -212,7 +205,7 @@ train_phi = tf.train.AdamOptimizer(
 
 if method != 'vanilla':
     train_theta = tf.train.AdamOptimizer(initial_rate).minimize(
-        loss_phi, var_list=theta)  # !!!!!
+        loss_phi, var_list=theta)
     train_step = tf.group(train_phi, train_theta)
 else:
     train_step = train_phi

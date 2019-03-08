@@ -12,7 +12,7 @@ from utils import one_hot, generate_nothing
 from models.preact_resnet import PreActResNet18
 from models.easy_net import ConvNet
 from dataset import DataSplit
-from sorting_operator import SortingOperator
+from neuralsort import NeuralSort
 from dknn_layer import DKNN
 
 torch.manual_seed(94305)

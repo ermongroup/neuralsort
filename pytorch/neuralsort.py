@@ -1,10 +1,12 @@
+
+
 import torch
 from torch import Tensor
 
 
-class SortingOperator (torch.nn.Module):
+class NeuralSort (torch.nn.Module):
     def __init__(self, tau=1.0, hard=False):
-        super(SortingOperator, self).__init__()
+        super(NeuralSort, self).__init__()
         self.hard = hard
         self.tau = tau
 
@@ -15,13 +17,11 @@ class SortingOperator (torch.nn.Module):
         scores = scores.unsqueeze(-1)
         bsize = scores.size()[0]
         dim = scores.size()[1]
-        # one = torch.ones((dim, 1), dtype=torch.float32)
         one = torch.cuda.FloatTensor(dim, 1).fill_(1)
 
         A_scores = torch.abs(scores - scores.permute(0, 2, 1))
         B = torch.matmul(A_scores, torch.matmul(
             one, torch.transpose(one, 0, 1)))
-        # scaling = (dim + 1 - 2 * (torch.arange(dim) + 1)).type(torch.float32)
         scaling = (dim + 1 - 2 * (torch.arange(dim) + 1)
                    ).type(torch.cuda.FloatTensor)
         C = torch.matmul(scores, scaling.unsqueeze(0))

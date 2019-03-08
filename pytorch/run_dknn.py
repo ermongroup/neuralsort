@@ -12,7 +12,7 @@ from utils import one_hot, generate_nothing
 from models.preact_resnet import PreActResNet18
 from models.easy_net import ConvNet
 from dataset import DataSplit
-from sorting_operator import SortingOperator
+from neuralsort import NeuralSort
 from dknn_layer import DKNN
 
 torch.manual_seed(94305)
@@ -70,20 +70,19 @@ def dknn_loss(query, neighbors, query_label, neighbor_labels, method=method):
     # query_labels: batch_size x [10] one-hot
     # neighbor_labels: n x [10] one-hot
     if method == 'deterministic':
-        top_k_ness = dknn_layer(query, neighbors)  # batch_size x n
-        correct = (query_label.unsqueeze(1) *
-                   neighbor_labels.unsqueeze(0)).sum(-1)  # batch_size x n
-        correct_in_top_k = (correct * top_k_ness).sum(-1)
-        loss = -correct_in_top_k
-        return loss  # batch_size
-    elif method == 'stochastic':
-        # num_samples x batch_size x n
         top_k_ness = dknn_layer(query, neighbors)
         correct = (query_label.unsqueeze(1) *
-                   neighbor_labels.unsqueeze(0)).sum(-1)  # batch_size x n
+                   neighbor_labels.unsqueeze(0)).sum(-1)
+        correct_in_top_k = (correct * top_k_ness).sum(-1)
+        loss = -correct_in_top_k
+        return loss
+    elif method == 'stochastic':
+        top_k_ness = dknn_layer(query, neighbors)
+        correct = (query_label.unsqueeze(1) *
+                   neighbor_labels.unsqueeze(0)).sum(-1)
         correct_in_top_k = (correct.unsqueeze(0) * top_k_ness).sum(-1)
         loss = -correct_in_top_k
-        return loss  # batch_size
+        return loss
     else:
         raise ValueError(method)
 
@@ -166,11 +165,11 @@ def new_predict(query, neighbors, neighbor_labels):
     neighbors: n x p
     neighbor_labels: n (int)
     '''
-    diffs = (query.unsqueeze(1) - neighbors.unsqueeze(0))  # M x n x p
+    diffs = (query.unsqueeze(1) - neighbors.unsqueeze(0))
     squared_diffs = diffs ** 2
-    norms = squared_diffs.sum(-1)  # M x n
+    norms = squared_diffs.sum(-1)
     indices = torch.argsort(norms, dim=-1)
-    labels = neighbor_labels.take(indices[:, :k])  # M x k
+    labels = neighbor_labels.take(indices[:, :k])
     prediction = [majority(l.tolist()) for l in labels]
     return torch.Tensor(prediction).to(device=gpu).long()
 
@@ -207,7 +206,7 @@ def test(epoch, val=False):
             query_x, query_y = queries
             query_x = query_x.to(device=gpu)
             query_y = query_y.to(device=gpu)
-            query_e = h_phi(query_x)  # batch_size x embedding_size
+            query_e = h_phi(query_x)
             results.append(acc(query_e, neighbors_e, query_y, labels))
         total_acc = np.mean(np.array(results))
         total_acc_batch = np.mean(results[0])
