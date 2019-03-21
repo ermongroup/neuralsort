@@ -90,11 +90,11 @@ python run_sort.py --M=100 --n=5 --l=4 --method=deterministic_neuralsort
 
 If you find NeuralSort useful in your research, please consider citing the following paper:
 
-> @inproceedings{
-> grover2018stochastic,
-> title={Stochastic Optimization of Sorting Networks via Continuous Relaxations},
-> author={Aditya Grover and Eric Wang and Aaron Zweig and Stefano Ermon},
-> booktitle={International Conference on Learning Representations},
-> year={2019},
-> url={https://openreview.net/forum?id=H1eSS3CcKX},
+> @inproceedings{ 
+> grover2018stochastic, 
+> title={Stochastic Optimization of Sorting Networks via Continuous Relaxations},  
+> author={Aditya Grover and Eric Wang and Aaron Zweig and Stefano Ermon},  
+> booktitle={International Conference on Learning Representations},  
+> year={2019},  
+> url={https://openreview.net/forum?id=H1eSS3CcKX},  
 > }
