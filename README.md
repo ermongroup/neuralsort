@@ -3,10 +3,9 @@
 This repository provides a reference implementation for learning NeuralSort-based models as described in the paper:
 
 > Stochastic Optimization of Sorting Networks via Continuous Relaxations
-> [Aditya Grover](https://aditya-grover.github.io), [Eric Wang](https://ericjwang.com), [Aaron Zweig] and [Stefano Ermon](https://cs.stanford.edu/~ermon/).  
-> AAAI Conference on Artificial Intelligence (AAAI), 2018.  
-> Paper: https://arxiv.org/pdf/1705.08868.pdf  
-> Blog post: https://ermongroup.github.io/blog/flow-gan
+> [Aditya Grover](https://aditya-grover.github.io), [Eric Wang](https://ericjwang.com), Aaron Zweig and [Stefano Ermon](https://cs.stanford.edu/~ermon/).  
+> International Conference on Learning Representations (ICLR), 2019.  
+> Paper: https://openreview.net/pdf?id=H1eSS3CcKX
 
 ## Requirements
 
