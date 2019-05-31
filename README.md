@@ -9,7 +9,7 @@ This repository provides a reference implementation for learning NeuralSort-base
 
 ## Requirements
 
-The codebase is implemented in Python 3.7. To install the necessary requirements, run the following commands:
+The codebase is implemented in Python 3.6. To install the necessary requirements, run the following commands:
 
 ```
 pip install -r requirements.txt
@@ -49,7 +49,7 @@ Learning and inference of quantile-regression models is handled by the `tf/media
   --lr FLOAT              initial learning rate
 ```
 
-Learning and inference of quantile-regression models is handled by the `tf/sort.py` script, which provides the following command-line arguments:
+Learning and inference of semantic sorting models for handwritten digits is handled by the `tf/sort.py` script, which provides the following command-line arguments:
 
 ```
   --M INT                 minibatch size
