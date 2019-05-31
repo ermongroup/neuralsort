@@ -231,7 +231,7 @@ train_sh, validate_sh, test_sh = sess.run([
 TRAIN_PER_EPOCH = mnist_input.TRAIN_SET_SIZE // (l * M)
 VAL_PER_EPOCH = mnist_input.VAL_SET_SIZE // (l * M)
 TEST_PER_EPOCH = mnist_input.TEST_SET_SIZE // (l * M)
-best_val = float('inf')
+best_correct_val = float('inf')
 tiebreaker_val = -1
 
 
@@ -272,8 +272,8 @@ def test(epoch, val=False):
     if val:
         prnt("Validation set: correctly identified %f, mean squared error %f" %
              (c_i, l_v))
-        if l_v < best_val:
-            best_val = l_v
+        if l_v < best_correct_val:
+            best_correct_val = l_v
             prnt('Saving...')
             save_model(epoch)
     else:
