@@ -49,7 +49,7 @@ Learning and inference of quantile-regression models is handled by the `tf/media
   --lr FLOAT              initial learning rate
 ```
 
-Learning and inference of quantile-regression models is handled by the `tf/sort.py` script, which provides the following command-line arguments:
+Learning and inference of sorting models is handled by the `tf/sort.py` script, which provides the following command-line arguments:
 
 ```
   --M INT                 minibatch size
