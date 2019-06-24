@@ -26,7 +26,7 @@ parser.add_argument("--k", type=int, metavar="k", required=True)
 parser.add_argument("--tau", type=float, metavar="tau", default=16.)
 parser.add_argument("--nloglr", type=float, metavar="-log10(beta)", default=3.)
 parser.add_argument("--method", type=str, default="deterministic")
-parser.add_argument("-resume", action='store_false')
+parser.add_argument("-resume", action='store_true')
 parser.add_argument("--dataset", type=str, required=True)
 
 parser.add_argument("--num_train_queries", type=int, default=100)

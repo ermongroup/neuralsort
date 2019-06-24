@@ -21,7 +21,7 @@ The scripts for downloading and loading the MNIST and CIFAR10 datasets are inclu
 
 ## Options
 
-Learning and inference of differentiable kNN models is handled by the `pytorch/main.py` script which provides the following command-line arguments:
+Learning and inference of differentiable kNN models is handled by the `pytorch/run_dknn.py` script which provides the following command-line arguments:
 
 ```
   --k INT                 number of nearest neighbors
@@ -36,7 +36,7 @@ Learning and inference of differentiable kNN models is handled by the `pytorch/m
   -resume                 start a new model, instead of loading an older one
 ```
 
-Learning and inference of quantile-regression models is handled by the `tf/median.py` script, which provides the following command-line arguments:
+Learning and inference of quantile-regression models is handled by the `tf/run_median.py` script, which provides the following command-line arguments:
 
 ```
   --M INT                 minibatch size
@@ -49,7 +49,7 @@ Learning and inference of quantile-regression models is handled by the `tf/media
   --lr FLOAT              initial learning rate
 ```
 
-Learning and inference of semantic sorting models for handwritten digits is handled by the `tf/sort.py` script, which provides the following command-line arguments:
+Learning and inference of sorting models is handled by the `tf/run_sort.py` script, which provides the following command-line arguments:
 
 ```
   --M INT                 minibatch size
@@ -69,7 +69,7 @@ _Training dKNN model to classify CIFAR10 digits_
 
 ```
 cd pytorch
-python run_dknn.py --k=9 --tau=64 --nloglr=3 --method=deterministic --dataset=cifar10 -startnew
+python run_dknn.py --k=9 --tau=64 --nloglr=3 --method=deterministic --dataset=cifar10
 ```
 
 _Training quantile regression model to predict the median of sets of nine 5-digit numbers_
