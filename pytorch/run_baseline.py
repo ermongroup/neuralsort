@@ -26,7 +26,7 @@ parser.add_argument("--k", type=int, metavar="k")
 parser.add_argument("--tau", type=float, metavar="tau")
 parser.add_argument("--nloglr", type=float, metavar="-log10(beta)")
 parser.add_argument("--method", type=str)
-parser.add_argument("-startnew", action='store_true')
+parser.add_argument("-resume", action='store_true')
 parser.add_argument("--dataset", type=str)
 
 args = parser.parse_args()
@@ -41,7 +41,7 @@ NUM_TEST_QUERIES = 10
 NUM_TRAIN_NEIGHBORS = 100
 LEARNING_RATE = 10 ** -args.nloglr
 NUM_SAMPLES = 5
-resume = not args.startnew
+resume = args.resume
 method = args.method
 
 NUM_EPOCHS = 150 if dataset == 'cifar10' else 50
