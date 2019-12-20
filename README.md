@@ -9,7 +9,7 @@ This repository provides a reference implementation for learning NeuralSort-base
 
 ## Requirements
 
-The codebase is implemented in Python 3.7. To install the necessary requirements, run the following commands:
+The codebase is implemented in Python 3.6. To install the necessary requirements, run the following commands:
 
 ```
 pip install -r requirements.txt
